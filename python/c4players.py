@@ -41,6 +41,17 @@ class ConnectFourHumanPlayer(ConnectFourPlayer):
         # Should not get here
         return -1
 
+class ConnectFourAIPlayer(ConnectFourPlayer):
+    def __init__(self, model):
+        self.model = model
+
+    # Currently our AI choses the move closest to the left
+    def get_move(self):
+        moves = self.model.get_valid_moves()
+        m = 0
+        while not moves[m]:
+            m += 1
+        return m
 
 class ConnectFourRandomPlayer(ConnectFourPlayer):
     def __init__(self, model):
