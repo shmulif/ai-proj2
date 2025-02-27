@@ -290,6 +290,16 @@ class Room:
     #Light orientation method
     def setup_lights(self):
 
+        # Extra light
+        extra_light = Light(
+                light_num=GL_LIGHT6,
+                position=[6, 4, 6, 1],
+                diffuse=[1.0, 1.0, 1.0, 1.0],
+                specular=[1.0, 1.0, 1.0, 1.0]
+            )
+        extra_light.enable()
+        # self.draw_light_indicator([6, 4, 6], [1.0, 1.0, 1.0]) 
+
         # Red Light
         if self.light_states['red']:
             red_light = Light(
