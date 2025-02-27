@@ -31,30 +31,27 @@ class Components:
 
         glScalef(1/3, 1/3, 1/3)
         Components.draw_connect_four__both_stands()
-        glTranslate(-(3.5 + 0.5/2), 2, 0)
+        glTranslate(-(3.5 + 0.5/2), 7, 0)
         for i in range(6):
             for j in range(7):
                 
                 glTranslate(1, 0, 0)
-                Components.draw_full_square(True)
 
-                # index = i + j  # Calculate the index
-                # if index < len(state):  # Ensure we are within bounds
-                #     value = state[index]
-                #     if value == 0:
-                #         print(f"state[{index}] = 0, action for 0")
-                #         # Perform action for 0 here
-                #     elif value == 1:
-                #         print(f"state[{index}] = 1, action for 1")
-                #         # Perform action for 1 here
-                #     elif value == 2:
-                #         print(f"state[{index}] = 2, action for 2")
-                #         # Perform action for 2 here
-                #     else:
-                #         print(f"state[{index}] = {value}, no special action")
+                value = state[i][j]
+                if value == '-':
+                    # print(f"state[{index}] = -, action for -")
+                    Components.draw_empty_square()
+                elif value == 'X':
+                    # print(f"state[{index}] = X, action for X")
+                    Components.draw_full_square(True)
+                elif value == 'O':
+                    # print(f"state[{index}] = O, action for O")
+                    Components.draw_full_square(False)
+                else:
+                    print(f"state[{index}] = {value}, unrecoginzed action")
 
 
-            glTranslate(-7, 1, 0) 
+            glTranslate(-7, -1, 0) 
 
     def draw_full_square(isRed):
         glPushMatrix()

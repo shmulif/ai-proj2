@@ -145,12 +145,12 @@ class Room:
                 if event.key == pygame.K_m:
                     if current_state_index < len(all_states) - 1:
                         current_state_index += 1
-                        print(current_state_index)
+                        # print(current_state_index)
 
                 elif event.key == pygame.K_b:
                     if current_state_index > 0:
                         current_state_index -= 1
-                        print(current_state_index)
+                        # print(current_state_index)
             
         
                 elif event.key == pygame.K_r: # Reset Camera to starting point
@@ -501,13 +501,34 @@ class Room:
         
         pygame.display.flip()
 
+    def parse_turns(self, input_str):
+        # Split the input string into turns based on 'Current turn' separator
+        turns = input_str.split('Current turn:')
+        
+        board_list = []
+        
+        for turn in turns[1:]:  # Skip the first empty element due to split
+            # Extract the board, which is between the 'Current turn' and the next
+            # 'Current turn' or end of the string
+            board_str = turn.strip().split('\n')[1:]  # Remove the "Current turn" label and empty line
+            board = []
+
+            for row in board_str:
+                board.append([cell if cell != '-' else '-' for cell in row.split()])
+            
+            board_list.append(board)
+        
+        return board_list
+
     def get_connect_four_input(self):
         global all_states, current_state_index
 
-        print(sys.argv) # Prints the command line arguments. Note that the 0th element is the name of the file
+        # print(sys.argv[1])
 
-        all_states = [1,2,3]
+        all_states = self.parse_turns(sys.argv[1])
         current_state_index = 0
+
+        
 
     def run(self):
         Components.initialize()

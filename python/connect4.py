@@ -6,15 +6,15 @@ from c4exceptions import IllegalMoveError
 
 def main():
     # Choose one of the following
-    # play_single_game()
-    play_batch_games(500)
+    play_single_game()
+    # play_batch_games(500)
 
 
 def play_single_game():
     model = c4model.ConnectFourModel()
 
     # Change the constructor calls to change the players used
-    player1 = c4players.ConnectFourHumanPlayer(model)
+    player1 = c4players.ConnectFourRandomPlayer(model)
     player2 = c4players.ConnectFourRandomPlayer(model)
 
     # Choose 1 of the Controller/View set-ups below
