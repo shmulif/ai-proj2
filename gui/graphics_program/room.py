@@ -134,6 +134,13 @@ class Room:
         global all_states, current_state_index
         """Handle keyboard and mouse input"""
         for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                self.running = False
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    self.running = False
+
             if event.type == pygame.KEYDOWN:  # Listen for key presses
                 if event.key == pygame.K_m:
                     if current_state_index < len(all_states) - 1:
@@ -145,27 +152,23 @@ class Room:
                         current_state_index -= 1
                         print(current_state_index)
             
-                if event.type == pygame.QUIT:
-                    self.running = False
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_ESCAPE:
-                        self.running = False
-                    elif event.key == pygame.K_r: # Reset Camera to starting point
-                        self.camera.eye.x = 0
-                        self.camera.eye.y = 5.67
-                        self.camera.eye.z = 8
-                        # Reset collision point to match the camera's position
-                        self.camera.collisionPoint.x = self.camera.eye.x
-                        self.camera.collisionPoint.y = self.camera.eye.y
-                        self.camera.collisionPoint.z = self.camera.eye.z
-                    elif event.key == pygame.K_t:  # Reset Vertical Camera position
-                        self.camera.heightAngle = INITIAL_LOOK_ANGLE
+        
+                elif event.key == pygame.K_r: # Reset Camera to starting point
+                    self.camera.eye.x = 0
+                    self.camera.eye.y = 5.67
+                    self.camera.eye.z = 8
+                    # Reset collision point to match the camera's position
+                    self.camera.collisionPoint.x = self.camera.eye.x
+                    self.camera.collisionPoint.y = self.camera.eye.y
+                    self.camera.collisionPoint.z = self.camera.eye.z
+                elif event.key == pygame.K_t:  # Reset Vertical Camera position
+                    self.camera.heightAngle = INITIAL_LOOK_ANGLE
 
-                    elif event.key in [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5]:
-                        light_index = event.key - pygame.K_0
-                        self.toggle_light(light_index)
-                    elif event.key == pygame.K_h: # Prints to console help message
-                        Components.help_message()
+                elif event.key in [pygame.K_0, pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5]:
+                    light_index = event.key - pygame.K_0
+                    self.toggle_light(light_index)
+                elif event.key == pygame.K_h: # Prints to console help message
+                    Components.help_message()
 
         keys = pygame.key.get_pressed()
         moveBack = False
