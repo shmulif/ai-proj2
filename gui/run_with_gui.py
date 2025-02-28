@@ -6,8 +6,7 @@ Program1 = 'python/connect4.py'
 
 
 # Run the first program and capture its output
-args_for_program1 = 'Sample args'
-process1 = subprocess.Popen(['python3', Program1] + args_for_program1.split(), stdout=subprocess.PIPE)
+process1 = subprocess.Popen(['python3', Program1], stdout=subprocess.PIPE)
 
 # Get the output from program1 (this will be passed as input to program2)
 output_program1 = process1.communicate()[0].decode('utf-8').strip()  # Decode to string and remove any extra whitespace
