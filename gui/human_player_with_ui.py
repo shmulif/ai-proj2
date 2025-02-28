@@ -1,12 +1,14 @@
 import subprocess
 import time
+import sys
 
-program1 = 'python/connect4.py'
+program1 ='python/connect4.py'
+programx = 'gui/test.py'
 program2 = 'gui/graphics_program/room_human_player.py'
 
 # Start Program 1
 process1 = subprocess.Popen(
-    ['python3', program1],
+    ['python3', '-u', program1],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
@@ -16,7 +18,7 @@ process1 = subprocess.Popen(
 
 # Start Program 2
 process2 = subprocess.Popen(
-    ['python3', program2],
+    ['python3', '-u', program2],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,
@@ -24,22 +26,43 @@ process2 = subprocess.Popen(
     universal_newlines=True
 )
 
+def consume_initial_lines(process, num_lines_to_ignore=5):
+    """
+    Function to read and discard the initial lines from a process's stdout.
+    Adjust the number of lines to ignore as needed.
+    """
+    ignored_lines_count = 3
+    while True:
+        line = process.stdout.readline().strip()
+        if not line:
+            break  # Stop if the line sis empty (end of output)
+        ignored_lines_count += 1
+        if ignored_lines_count >= num_lines_to_ignore:
+            break  # Stop after ignoring the specified number of lines
+
+
+# Consume initial lines from Program 2
+consume_initial_lines(process2)
+
 def stream_data():
     try:
         program1_output = ""
+        end_marker = "): "
+
         while True:
-            line = process1.stdout.readline().split()  # Read one line from program 1
-            print(line)
-            if line:
-                print(f"Read from program1: {line}")  # Debug: Show what we're reading from program1
+            char = process1.stdout.read(1)  # Read one character
+            if char == "":  # Empty string means no more output
+                if process1.poll() is not None:  # Process finished
+                    break
+            print(f"{char}", end="")
+            sys.stdout.flush()  # Ensure immediate output
+            program1_output += char
+            
+            # Check if the end of program1_output matches the end_marker
+            if program1_output.endswith(end_marker):
+                print("\nEnd of current info reached!")
+                break  # Exit the loop if the end_marker is found
 
-            if "Enter column (1-7):" in line:  # Stop reading when we hit the expected prompt
-                print("we didn't breake out of the loop yet.")
-                program1_output += line + "\n"
-                break  # Exit the loop after the prompt is received
-
-            if line:  # Only add non-empty lines to the output
-                program1_output += line + "\n"  # Add the line to the output buffer
         print("we broke out of the loop. yay! we're free!")
         if program1_output:
             print(f"Program 1 Output: \n{program1_output}")

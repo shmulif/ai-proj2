@@ -541,6 +541,7 @@ class Room:
             board_list.append(board)
         
         return board_list
+    
     def parse_grids(self, input_text):
         global all_states  # Declare the use of the global array
 
@@ -591,7 +592,7 @@ class Room:
 
             # Now we have the complete input in input_buffer
             if input_buffer:
-                print(f"Received full input: \n{input_buffer}")
+                # print(f"Received full input: \n{input_buffer}")
                 self.parse_grids(input_buffer)
                 # self.process_game_input(input_buffer)
             else:
@@ -600,7 +601,14 @@ class Room:
                 # all_states = self.parse_turns()
                 # current_state_index = 0
 
-        
+    def get_test_input(self):
+        # Open a text file and redirect sys.stdin to read from it
+        with open('gui/graphics_program/input.txt', 'r') as file:
+            sys.stdin = file
+            
+            # # Now reading from stdin will read from the file
+            # for line in sys.stdin:
+            #     print(line.strip())  # Process the lines as needed
 
     def run(self):
         Components.initialize()
@@ -608,6 +616,7 @@ class Room:
         Components.config_balls()
         """Main game loop""" 
 
+        self.get_test_input()
         # self.get_connect_four_input()
 
         while self.running:
