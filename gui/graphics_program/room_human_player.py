@@ -606,9 +606,9 @@ class Room:
         with open('gui/graphics_program/input.txt', 'r') as file:
             sys.stdin = file
             
-            # # Now reading from stdin will read from the file
-            # for line in sys.stdin:
-            #     print(line.strip())  # Process the lines as needed
+            # Now reading from stdin will read from the file
+            for line in sys.stdin:
+                print(line.strip())  # Process the lines as needed
 
     def run(self):
         Components.initialize()
@@ -616,7 +616,7 @@ class Room:
         Components.config_balls()
         """Main game loop""" 
 
-        self.get_test_input()
+        # self.get_test_input()
         # self.get_connect_four_input()
 
         while self.running:

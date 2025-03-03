@@ -60,17 +60,30 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
     # Currently our AI choses the move closest to the left
     def get_move(self):
+        # Replace the following code with an alpha beta prunin algorithm
         moves = self.model.get_valid_moves()
         m = 0
         while not moves[m]:
             m += 1
         return m
+
+    def utility(self, board_state):
+        terminal_status = self.terminal_test(board_state) # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
+        if terminal_status == 0: # There's a winner
+            return 1000
+        elif terminal_status == 1: # There's a draw
+            return 0
+        elif terminal_status == -1: # Games not over
+            return -100
+        else:
+            print("We shouldnt have gotten here! There's some error in the code, go fix it please")
     
     def valid_actions(self, board_state):
         NUMCOLS = 7
         EMPTY = -1
         return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
     
+    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
     def result(self, action, board_state):
         NUMROWS = 6
         EMPTY = -1
@@ -166,4 +179,9 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                         return False
             return True
 
-        return theres_a_winner() or theres_a_draw()
+        if theres_a_winner():
+            return 0
+        elif theres_a_draw():
+            return 1
+        else:
+            return -1
