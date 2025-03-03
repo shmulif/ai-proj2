@@ -60,7 +60,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
     # Currently our AI choses the move closest to the left
     def get_move(self):
-        # Replace the following code with an alpha beta prunin algorithm
+        # Replace the following code with an alpha beta pruning algorithm
         moves = self.model.get_valid_moves()
         m = 0
         while not moves[m]:
@@ -83,7 +83,6 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         EMPTY = -1
         return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
     
-    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
     def result(self, action, board_state):
         NUMROWS = 6
         EMPTY = -1
@@ -112,6 +111,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         raise ValueError(f"Column {action} is full!")  # Handle full column case
     
+    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
     def terminal_test(self, board_state):
 
         NUMROWS = 6
