@@ -1,4 +1,5 @@
 import random
+import math
 
 
 class ConnectFourPlayer:
@@ -59,13 +60,17 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         self.model = model
 
     # Currently our AI choses the move closest to the left
-    def get_move(self):
+    def get_move(self, board_state):
         # Replace the following code with an alpha beta pruning algorithm
+        m = self.alpha_beta_search(self.board_state)
+        return m
+        """ OLD CODE, LEFT FIRST
         moves = self.model.get_valid_moves()
         m = 0
         while not moves[m]:
             m += 1
         return m
+        """
 
     def utility(self, board_state):
         terminal_status = self.terminal_test(board_state) # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
@@ -185,3 +190,36 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             return 1
         else:
             return -1
+    
+    def alpha_beta_search(self,board_state):
+        output = self.max_value(board_state, -1000, 1000)
+        return output[1]
+    
+    def max_value(self,board_state, alpha, beta):
+        if self.terminal_test(board_state):
+            return self.utility(board_state), None
+        v = -math.inf
+        for a in self.valid_actions(board_state):
+            (v2,a2) = self.min_value(self.result(board_state,a),alpha,beta)
+            if v2 > v:
+                (v,move) = v2,a
+                alpha = max(alpha, v)
+            if v >= beta:
+                return (v, move)
+        return (v,move)
+    
+    def min_value(self,board_state, alpha, beta):
+        if self.terminal_test(board_state):
+            return self.utility(board_state), None
+        v = math.inf
+        for a in self.valid_actions(board_state):
+            (v2,a2) = self.max_value(self.result(board_state,a),alpha,beta)
+            if v2 < v:
+                (v,move) = v2,a
+                beta = min(beta, v)
+            if v <= alpha:
+                return (v, move)
+        return (v,move)
+    
+
+
