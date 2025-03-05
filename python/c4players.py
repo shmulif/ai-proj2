@@ -79,7 +79,27 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             m += 1
         return m
         """
+    
+    def valid_actions(self, board_state):
+    
+        return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
+    
+    def result(self, action, board_state):
 
+        board_state_copy = [row for row in board_state]
+        current_player = self.get_current_player()
+
+        # Loop through the rows in reverse order, starting from the last/bottom row (NUMROWS - 1) to the first/top row (0)
+        for row in range(NUMROWS - 1, -1, -1):
+            if board_state_copy[row][action] == EMPTY:
+                board_state_copy[row][action] = current_player
+                return board_state_copy
+
+        raise ValueError(f"Column {action} is full!")  # Handle full column case
+    
+    
+    # Alpha beta functions
+    
     def utility(self, board_state):
         terminal_status = self.terminal_test(board_state) # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
         if terminal_status == 0: # There's a winner
@@ -90,37 +110,58 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             return -1000
         else:
             print("We shouldnt have gotten here! There's some error in the code, go fix it please")
+            
     
-    def valid_actions(self, board_state):
+    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
+    def terminal_test(self, board_state):
+        
+        # This functions assumes that the given state is valid
+        def theres_a_draw():
+            for i in range(NUMCOLS):
+                if board_state[i][0] == EMPTY:
+                        return False
+            return True
+
+        if self.check_for_win(): # Calculate who we are and pass it in
+            return 0
+        elif theres_a_draw():
+            return 1
+        else:
+            return -1
+
+    def alpha_beta_search(self,board_state):
+        output = self.max_value(board_state, -1000, 1000)
+        return output[1]
     
-        return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
+    def max_value(self,board_state, alpha, beta):
+        if self.utility(board_state) != -1000:
+            return (self.utility(board_state), None)
+        v = -math.inf
+        for a in self.valid_actions(board_state):
+            (v2,a2) = self.min_value(self.result(board_state,a),alpha,beta)
+            if v2 > v:
+                (v,move) = v2,a
+                alpha = max(alpha, v)
+            if v >= beta:
+                return (v, move)
+        return (v,move)
     
-    def result(self, action, board_state):
-
-        def get_current_player():
-            player1_piece_count = sum(row.count(1) for row in board_state)
-            player2_piece_count = sum(row.count(2) for row in board_state)
-
-            if player2_piece_count < player1_piece_count:
-                return 2
-            elif player2_piece_count == player1_piece_count:
-                return 1
-            else:
-                raise ValueError(
-                    f"Invalid board state! player1: {player1_piece_count}, player2: {player2_piece_count}"
-                )
-
-        board_state_copy = [row for row in board_state]
-        current_player = get_current_player()
-
-        # Loop through the rows in reverse order, starting from the last/bottom row (NUMROWS - 1) to the first/top row (0)
-        for row in range(NUMROWS - 1, -1, -1):
-            if board_state_copy[row][action] == EMPTY:
-                board_state_copy[row][action] = current_player
-                return board_state_copy
-
-        raise ValueError(f"Column {action} is full!")  # Handle full column case
+    def min_value(self,board_state, alpha, beta):
+        if self.utility(board_state) != -1000:
+            return self.utility(board_state), None
+        v = math.inf
+        for a in self.valid_actions(board_state):
+            (v2,a2) = self.max_value(self.result(board_state,a),alpha,beta)
+            if v2 < v:
+                (v,move) = v2,a
+                beta = min(beta, v)
+            if v <= alpha:
+                return (v, move)
+        return (v,move)
     
+    
+    # Helper functions
+
     def check_for_win(player, board_state): # options are PLAYER1, PLAYER2, or ANY
 
         def horizontal_win():
@@ -175,54 +216,19 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                     vertical_win() or
                     neg_diagonal_win() or
                     pos_diagonal_win()) 
-            
-    
-    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
-    def terminal_test(self, board_state):
+
+
+    def get_current_player(board_state):
         
-        # This functions assumes that the given state is valid
-        def theres_a_draw():
-            for i in range(NUMCOLS):
-                if board_state[i][0] == EMPTY:
-                        return False
-            return True
+        player1_piece_count = sum(row.count(1) for row in board_state)
+        player2_piece_count = sum(row.count(2) for row in board_state)
 
-        if check_for_win(): # Calculate who we are and pass it in
-            return 0
-        elif theres_a_draw():
-            return 1
+        if player2_piece_count < player1_piece_count:
+            return PLAYER2
+        elif player2_piece_count == player1_piece_count:
+            return PLAYER1
         else:
-            return -1
-    
-    def alpha_beta_search(self,board_state):
-        output = self.max_value(board_state, -1000, 1000)
-        return output[1]
-    
-    def max_value(self,board_state, alpha, beta):
-        if self.utility(board_state) != -1000:
-            return (self.utility(board_state), None)
-        v = -math.inf
-        for a in self.valid_actions(board_state):
-            (v2,a2) = self.min_value(self.result(board_state,a),alpha,beta)
-            if v2 > v:
-                (v,move) = v2,a
-                alpha = max(alpha, v)
-            if v >= beta:
-                return (v, move)
-        return (v,move)
-    
-    def min_value(self,board_state, alpha, beta):
-        if self.utility(board_state) != -1000:
-            return self.utility(board_state), None
-        v = math.inf
-        for a in self.valid_actions(board_state):
-            (v2,a2) = self.max_value(self.result(board_state,a),alpha,beta)
-            if v2 < v:
-                (v,move) = v2,a
-                beta = min(beta, v)
-            if v <= alpha:
-                return (v, move)
-        return (v,move)
-    
-
+            raise ValueError(
+                f"Invalid board state! player1: {player1_piece_count}, player2: {player2_piece_count}"
+            )
 
