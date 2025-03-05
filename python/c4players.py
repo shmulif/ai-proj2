@@ -60,9 +60,9 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         self.model = model
 
     # Currently our AI choses the move closest to the left
-    def get_move(self, board_state):
+    def get_move(self):
         # Replace the following code with an alpha beta pruning algorithm
-        m = self.alpha_beta_search(self.board_state)
+        m = self.alpha_beta_search(self.model.get_grid())
         return m
         """ OLD CODE, LEFT FIRST
         moves = self.model.get_valid_moves()
@@ -79,7 +79,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         elif terminal_status == 1: # There's a draw
             return 0
         elif terminal_status == -1: # Games not over
-            return -100
+            return -1000
         else:
             print("We shouldnt have gotten here! There's some error in the code, go fix it please")
     
@@ -196,8 +196,8 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         return output[1]
     
     def max_value(self,board_state, alpha, beta):
-        if self.terminal_test(board_state):
-            return self.utility(board_state), None
+        if self.utility(board_state) != -1000:
+            return (self.utility(board_state), None)
         v = -math.inf
         for a in self.valid_actions(board_state):
             (v2,a2) = self.min_value(self.result(board_state,a),alpha,beta)
@@ -209,7 +209,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         return (v,move)
     
     def min_value(self,board_state, alpha, beta):
-        if self.terminal_test(board_state):
+        if self.utility(board_state) != -1000:
             return self.utility(board_state), None
         v = math.inf
         for a in self.valid_actions(board_state):
