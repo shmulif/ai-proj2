@@ -53,7 +53,15 @@ class ConnectFourRandomPlayer(ConnectFourPlayer):
         while not moves[m]:
             m = random.randrange(7)
         return m
-    
+
+# Constant variable used by AI Player
+
+PLAYER1 = 1
+PLAYER2 = 2
+EMPTY = -1
+
+NUMCOLS = 7
+NUMROWS = 6
 
 class ConnectFourAIPlayer(ConnectFourPlayer):
     def __init__(self, model):
@@ -84,13 +92,10 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             print("We shouldnt have gotten here! There's some error in the code, go fix it please")
     
     def valid_actions(self, board_state):
-        NUMCOLS = 7
-        EMPTY = -1
+    
         return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
     
     def result(self, action, board_state):
-        NUMROWS = 6
-        EMPTY = -1
 
         def get_current_player():
             player1_piece_count = sum(row.count(1) for row in board_state)
@@ -116,13 +121,8 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         raise ValueError(f"Column {action} is full!")  # Handle full column case
     
-    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
-    def terminal_test(self, board_state):
+    def check_for_win(player, board_state): # options are PLAYER1, PLAYER2, or ANY
 
-        NUMROWS = 6
-        NUMCOLS = 7
-        EMPTY = -1
-        
         def horizontal_win():
             win = False
             for row in range(NUMROWS):
@@ -171,11 +171,14 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                         return True
             return False
         
-        def theres_a_winner():
-            return (horizontal_win() or
+        return (horizontal_win() or
                     vertical_win() or
                     neg_diagonal_win() or
                     pos_diagonal_win()) 
+            
+    
+    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
+    def terminal_test(self, board_state):
         
         # This functions assumes that the given state is valid
         def theres_a_draw():
@@ -184,7 +187,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                         return False
             return True
 
-        if theres_a_winner():
+        if check_for_win(): # Calculate who we are and pass it in
             return 0
         elif theres_a_draw():
             return 1
