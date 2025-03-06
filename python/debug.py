@@ -1,6 +1,13 @@
 import math
 import c4players
 
+PLAYER1 = 1
+PLAYER2 = 2
+EMPTY = -1
+
+NUMROWS = 6
+NUMCOLS = 7
+
 # Sample board states
 board_states = [
     [  # Board state 1: A near-complete board with no winner yet
@@ -12,6 +19,18 @@ board_states = [
         [1, 2, 2, 1, 1, 2, 1]
     ]
 ]
+
+
+def create_empty_grid():
+    new_grid = []
+    for i in range(NUMCOLS):
+        column = []
+        for j in range(NUMROWS):
+            if j != 1:
+                column.append(EMPTY)
+            else:
+                column.append(6)
+        board_states.append(column)
 
 
 # Simulate running the AI with each board state

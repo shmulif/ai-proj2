@@ -163,10 +163,10 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             win = False
             for row in range(NUMROWS):
                 for col in range(4):
-                    if board_state[col][row] != EMPTY:
-                        win = (board_state[col][row] == board_state[col + 1][row]) and (
-                            board_state[col][row] == board_state[col + 2][row]) and (
-                                board_state[col][row] == board_state[col + 3][row])
+                    if board_state[row][col] != EMPTY:
+                        win = (board_state[row][col] == board_state[row][col + 1]) and (
+                            board_state[row][col] == board_state[row][col + 2]) and (
+                                board_state[row][col] == board_state[row][col + 3])
                     if win:
                         return True
             return False
@@ -175,24 +175,24 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             win = False
             for col in range(NUMCOLS):
                 for row in range(3):
-                    print("col: "+str(col)+" - row: "+str(row)+" current piece: "+str(board_state[col][row]))
-                    if board_state[col][row] != EMPTY:
-                        win = (board_state[col][row] == board_state[col][row + 1]) and (
-                            board_state[col][row] == board_state[col][row + 2]) and (
-                                board_state[col][row] == board_state[col][row + 3])
+                    if board_state[row][col] != EMPTY:
+                        win = (board_state[row][col] == board_state[row + 1][col]) and (
+                            board_state[row][col] == board_state[row + 2][col]) and (
+                                board_state[row][col] == board_state[row + 3][col])
                     if win:
                         return True
-                print()
             return False
 
         def neg_diagonal_win():
             win = False
             for col in range(4):
+                print(col)
                 for row in range(3):
-                    if board_state[col][row] != EMPTY:
-                        win = (board_state[col][row] == board_state[col + 1][row + 1]) and (
-                            board_state[col][row] == board_state[col + 2][row + 2]) and (
-                                board_state[col][row] == board_state[col + 3][row + 3])
+                    if board_state[row][col] != EMPTY:
+                        print("col: "+str(col)+" - row: "+str(row)+" --- current_piece: "+str(board_state[row][col]))
+                        win = (board_state[row][col] == board_state[row - 1][col + 1]) and (
+                            board_state[row][col] == board_state[row - 2][col + 2]) and (
+                                board_state[row][col] == board_state[row - 3][col + 3])
                     if win:
                         return True
             return False
@@ -201,14 +201,17 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             win = False
             for col in range(3, 7):
                 for row in range(3):
-                    if board_state[col][row] != EMPTY:
-                        win = (board_state[col][row] == board_state[col - 1][row + 1]) and (
-                            board_state[col][row] == board_state[col - 2][row + 2]) and (
-                                board_state[col][row] == board_state[col - 3][row + 3])
+                    if board_state[row][col] != EMPTY:
+                        win = (board_state[row][col] == board_state[row + 1][col + 1]) and (
+                            board_state[row][col] == board_state[row + 2][col + 2]) and (
+                                board_state[row][col] == board_state[row + 3][col + 3])
                     if win:
                         return True
             return False
-        
+        print("horizontal win: "+str(horizontal_win()))
+        print("vertical win: "+str(vertical_win()))
+        print("ned_diagonal win: "+str(neg_diagonal_win()))
+        print("pos_diagonal win: "+str(pos_diagonal_win()))
         return (horizontal_win() 
                 or vertical_win() 
                 or neg_diagonal_win() 
