@@ -10,15 +10,80 @@ NUMCOLS = 7
 
 # Sample board states
 board_states = [
-    [  # Board state 1: A near-complete board with no winner yet
-        [-1, 1, -1, 1, -1, 2, -1],
-        [-1, 2, -1, 1, -1, 2, -1],
-        [-1, 2, -1, 1, 1, 1, -1],
-        [2, 2, -1, 2, 2, 1, 1],
-        [1, 1, -1, 2, 1, 2, 2],
-        [1, 2, 2, 1, 1, 2, 1]
+    [  # Board state 1: A board with no winner yet
+        [-1, -1, -1, 2, 1, 1],  
+        [1, 2, 2, 2, 1, 2],  
+        [-1, -1, -1, -1, -1, 2],
+        [1, 1, 1, 2, 2, 1], 
+        [-1, -1, 1, 2, 1, 1],  
+        [2, 2, 1, 1, 2, 2],  
+        [-1, -1, -1, 1, 2, 1] 
+    ],
+    [ # Board state 2: An empty board
+        [-1, -1, -1, -1, -1, -1],  # Col 1
+        [-1, -1, -1, -1, -1, -1],  # Col 2
+        [-1, -1, -1, -1, -1, -1],  # Col 3
+        [-1, -1, -1, -1, -1, -1],  # Col 4
+        [-1, -1, -1, -1, -1, -1],  # Col 5
+        [-1, -1, -1, -1, -1, -1],  # Col 6
+        [-1, -1, -1, -1, -1, -1]   # Col 7
+    ],
+    [ # Board state 3: A draw
+        [1, 2, 1, 1, 2, 1],  # Col 1
+        [2, 1, 2, 2, 1, 2],  # Col 2
+        [1, 2, 1, 1, 2, 1],  # Col 3
+        [2, 1, 2, 2, 1, 2],  # Col 4
+        [1, 2, 1, 1, 2, 1],  # Col 5
+        [2, 1, 2, 2, 1, 2],  # Col 6
+        [1, 2, 1, 1, 2, 1]   # Col 7
+    ],
+    [ # Board state 4: A (horizontal) win for player 1
+        [-1, -1, -1, -1, 2, 1],  # Col 1
+        [-1, -1, -1, -1, 2, 1],  # Col 2
+        [-1, -1, -1, -1, -1, 1],  # Col 3
+        [-1, -1, -1, -1, -1, 1],  # Col 4
+        [-1, -1, -1, -1, -1, -1],  # Col 5
+        [-1, -1, -1, -1, -1, -1],  # Col 6
+        [-1, -1, -1, -1, -1, 2]   # Col 7
+    ],
+    [ # Board state 5: A (vertical) win for player 2
+        [-1, -1, -1, -1, 2, 1],  # Col 1
+        [-1, -1, -1, -1, 2, 1],  # Col 2
+        [-1, -1, -1, -1, 1, 1],  # Col 3
+        [-1, -1, -1, -1, 1, 2],  # Col 4
+        [-1, -1, -1, -1, -1, 1],  # Col 5
+        [-1, -1, -1, -1, -1, 1],  # Col 6
+        [-1, -1, 2, 2, 2, 2]   # Col 7
+    ],
+    [ # Board state 6: A (pos diagonal) win for player 1 (col 1 is on the left, so this representation is flipped)
+        [-1, -1, -1, -1, -1, 1],  # Col 1
+        [-1, -1, -1, -1, 1, 2],  # Col 2
+        [-1, -1, -1, 1, 2, 2],  # Col 3
+        [-1, -1, 1, 2, 2, 1],  # Col 4
+        [-1, -1, -1, -1, -1, 1],  # Col 5
+        [-1, -1, -1, -1, -1, 2],  # Col 6
+        [-1, -1, -1, -1, -1, -1]   # Col 7
+    ],
+    [ # Board state 7: A (neg diagonal) win for player 1 (col 1 is on the left, so this representation is flipped)
+        [-1, -1, -1, -1, -1, 2],  # Col 1
+        [-1, -1, -1, -1, -1, 2],  # Col 2
+        [-1, -1, -1, -1, 2, 1],  # Col 3
+        [-1, -1, 1, 1, 2, 2],  # Col 4
+        [-1, -1, -1, 1, 1, 2],  # Col 5
+        [-1, -1, -1, -1, 1, 2],  # Col 6
+        [-1, -1, -1, -1, -1, 1]   # Col 7
     ]
 ]
+
+board_state_label = [
+                     'A board with no winner yet', 
+                     'An empty board', 
+                     'A draw', 
+                     'A (horizontal) win for player 1', 
+                     'A (vertical) win for player 2', 
+                     'A (pos diagonal) win for player 1',
+                     'A (neg diagonal) win for player 1'
+                     ]
 
 
 def create_empty_grid():
@@ -50,14 +115,15 @@ def debut_ai(model, board_states):
     
     for idx, state in enumerate(board_states):
         iteration += 1
-        print(f"\nTesting board state {iteration}:")
+        print(f"\nTesting board state {iteration}: " + board_state_label[iteration-1])
         print_board(state)
         
         # Test specific functions
-        # test_valid_actions(ai_player, state)
-        # test_result(ai_player, 4, state)
-        # test_utility(ai_player, state)
-        test_terminal_test(ai_player, state)
+
+        test_valid_actions(ai_player, state) # Verified
+        test_result(ai_player, 3, state) # Verified
+        test_utility(ai_player, state) # Verified
+        test_terminal_test(ai_player, state) # Verified
         # test_alpha_beta_search(ai_player, state)
 
 # Functions to test individual functions in ConnectFourAIPlayer
@@ -67,7 +133,7 @@ def test_valid_actions(ai_player, board_state):
     print(actions)
 
 def test_result(ai_player, action, board_state):
-    print("\nTesting result function (example with action in column 3):")
+    print(f"\nTesting result function (example with action in column {action}):")
     result_state = ai_player.result(action, board_state)  # Example action in column 3
     print_board(result_state)
 

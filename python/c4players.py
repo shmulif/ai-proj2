@@ -1,5 +1,6 @@
 import random
 import math
+import c4model
 
 
 class ConnectFourPlayer:
@@ -53,19 +54,22 @@ class ConnectFourRandomPlayer(ConnectFourPlayer):
         while not moves[m]:
             m = random.randrange(7)
         return m
-
-# Constant variable used by AI Player
-
-PLAYER1 = 1
-PLAYER2 = 2
-EMPTY = -1
-
-NUMCOLS = 7
-NUMROWS = 6
+    
 
 class ConnectFourAIPlayer(ConnectFourPlayer):
+
     def __init__(self, model):
         self.model = model
+        self.initialize_game_specifications()
+
+    def initialize_game_specifications(self):
+        # Set up for connect four (this setup will be different in tic tac toe)
+        self.PLAYER1 = c4model.PLAYER1 # 1
+        self.PLAYER2 = c4model.PLAYER2 # 2
+        self.EMPTY = c4model.EMPTY # -1
+
+        self.NUMROWS = c4model.NUMROWS # 6
+        self.NUMCOLS = c4model.NUMROWS # 7
 
     def get_move(self):
         m = self.alpha_beta_search(self.model.get_grid())
@@ -79,21 +83,22 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         """
     
     def valid_actions(self, board_state):
-        return [x for x in range(NUMCOLS) if board_state[0][x] == EMPTY]
+        return [x for x in range(self.NUMCOLS) if board_state[x][0] == self.EMPTY]
 
     
-    def result(self, action, board_state):
-
-        board_state_copy = [row for row in board_state]
+    def result(self, action, board_state): 
+        # Perform a **deep copy** of the board
+        board_state_copy = [col[:] for col in board_state]  # Copy each column separately
+        
         current_player = self.get_current_player(board_state)
 
-        # Loop through the rows in reverse order, starting from the last/bottom row (NUMROWS - 1) to the first/top row (0)
-        for row in range(NUMROWS - 1, -1, -1):
-            if board_state_copy[row][action] == EMPTY:
-                board_state_copy[row][action] = current_player
-                return board_state_copy
+        # Start from the lowest row (bottom of the column) and move upward
+        for row in range(self.NUMROWS - 1, -1, -1):  # Iterate from bottom (5) to top (0)
+            if board_state_copy[action][row] == self.EMPTY:  # Check if the slot is empty
+                board_state_copy[action][row] = current_player  # Drop the piece
+                return board_state_copy  # Return the updated board state
 
-        raise ValueError(f"Column {action} is full!")  # Handle full column case
+        raise ValueError(f"Column {action} is full!")  # No empty slots
     
     def utility(self, board_state):
         terminal_status = self.terminal_test(board_state) # Returns 1 if theres a winner, 0 if theres a draw, and -1 if the games not over
@@ -151,34 +156,34 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     # Helper functions
 
     def check_for_draw(self, board_state): # This functions assumes that the given state is valid
-        for i in range(NUMCOLS):
-            if board_state[i][0] == EMPTY:
+        for i in range(self.NUMCOLS):
+            if board_state[i][0] == self.EMPTY:
                     return False
         return True
     
 
-    def check_for_win(self, board_state, player="any"): # options are PLAYER1, PLAYER2, or if no player is provided we check if there is any winner
+    def check_for_win(self, board_state, player="any"): # options are self.PLAYER1, self.PLAYER2, or if no player is provided we check if there is any winner
 
         def horizontal_win():
             win = False
-            for row in range(NUMROWS):
+            for row in range(self.NUMROWS):
                 for col in range(4):
-                    if board_state[row][col] != EMPTY:
-                        win = (board_state[row][col] == board_state[row][col + 1]) and (
-                            board_state[row][col] == board_state[row][col + 2]) and (
-                                board_state[row][col] == board_state[row][col + 3])
+                    if board_state[col][row] != self.EMPTY:
+                        win = (board_state[col][row] == board_state[col + 1][row]) and (
+                            board_state[col][row] == board_state[col + 2][row]) and (
+                                board_state[col][row] == board_state[col + 3][row])
                     if win:
                         return True
             return False
 
         def vertical_win():
             win = False
-            for col in range(NUMCOLS):
+            for col in range(self.NUMCOLS):
                 for row in range(3):
-                    if board_state[row][col] != EMPTY:
-                        win = (board_state[row][col] == board_state[row + 1][col]) and (
-                            board_state[row][col] == board_state[row + 2][col]) and (
-                                board_state[row][col] == board_state[row + 3][col])
+                    if board_state[col][row] != self.EMPTY:
+                        win = (board_state[col][row] == board_state[col][row + 1]) and (
+                            board_state[col][row] == board_state[col][row + 2]) and (
+                                board_state[col][row] == board_state[col][row + 3])
                     if win:
                         return True
             return False
@@ -186,13 +191,11 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         def neg_diagonal_win():
             win = False
             for col in range(4):
-                print(col)
                 for row in range(3):
-                    if board_state[row][col] != EMPTY:
-                        print("col: "+str(col)+" - row: "+str(row)+" --- current_piece: "+str(board_state[row][col]))
-                        win = (board_state[row][col] == board_state[row - 1][col + 1]) and (
-                            board_state[row][col] == board_state[row - 2][col + 2]) and (
-                                board_state[row][col] == board_state[row - 3][col + 3])
+                    if board_state[col][row] != self.EMPTY:
+                        win = (board_state[col][row] == board_state[col + 1][row + 1]) and (
+                            board_state[col][row] == board_state[col + 2][row + 2]) and (
+                                board_state[col][row] == board_state[col + 3][row + 3])
                     if win:
                         return True
             return False
@@ -201,17 +204,14 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             win = False
             for col in range(3, 7):
                 for row in range(3):
-                    if board_state[row][col] != EMPTY:
-                        win = (board_state[row][col] == board_state[row + 1][col + 1]) and (
-                            board_state[row][col] == board_state[row + 2][col + 2]) and (
-                                board_state[row][col] == board_state[row + 3][col + 3])
+                    if board_state[col][row] != self.EMPTY:
+                        win = (board_state[col][row] == board_state[col - 1][row + 1]) and (
+                            board_state[col][row] == board_state[col - 2][row + 2]) and (
+                                board_state[col][row] == board_state[col - 3][row + 3])
                     if win:
                         return True
             return False
-        print("horizontal win: "+str(horizontal_win()))
-        print("vertical win: "+str(vertical_win()))
-        print("ned_diagonal win: "+str(neg_diagonal_win()))
-        print("pos_diagonal win: "+str(pos_diagonal_win()))
+
         return (horizontal_win() 
                 or vertical_win() 
                 or neg_diagonal_win() 
@@ -225,12 +225,24 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         if player2_piece_count < player1_piece_count:
             print("It's players2's turn")
-            return PLAYER2
+            return self.PLAYER2
         elif player2_piece_count == player1_piece_count:
             print("It's players1's turn")
-            return PLAYER1
+            return self.PLAYER1
         else:
             raise ValueError(
                 f"Invalid board state! player1: {player1_piece_count}, player2: {player2_piece_count}"
             )
+        
+    def other_player(self, player):
 
+        if player == self.PLAYER1:
+            return self.PLAYER2
+        
+        elif player == self.PLAYER2:
+            return self.PLAYER1
+        
+        else:
+            raise ValueError(
+                f"Invalid input: {player}! option's are player1, represented as: {self.PLAYER1}, or player2, represented as: {self.PLAYER2}"
+            )
