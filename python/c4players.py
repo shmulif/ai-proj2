@@ -67,9 +67,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     def __init__(self, model):
         self.model = model
 
-    # Currently our AI choses the move closest to the left
     def get_move(self):
-        # Replace the following code with an alpha beta pruning algorithm
         m = self.alpha_beta_search(self.model.get_grid())
         return m
         """ OLD CODE, LEFT FIRST
@@ -81,13 +79,13 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         """
     
     def valid_actions(self, board_state):
-    
-        return [(board_state[x][0] == EMPTY) for x in range(NUMCOLS)]
+        return [x for x in range(NUMCOLS) if board_state[0][x] == EMPTY]
+
     
     def result(self, action, board_state):
 
         board_state_copy = [row for row in board_state]
-        current_player = self.get_current_player()
+        current_player = self.get_current_player(board_state)
 
         # Loop through the rows in reverse order, starting from the last/bottom row (NUMROWS - 1) to the first/top row (0)
         for row in range(NUMROWS - 1, -1, -1):
@@ -97,14 +95,11 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         raise ValueError(f"Column {action} is full!")  # Handle full column case
     
-    
-    # Alpha beta functions
-    
     def utility(self, board_state):
-        terminal_status = self.terminal_test(board_state) # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
-        if terminal_status == 0: # There's a winner
+        terminal_status = self.terminal_test(board_state) # Returns 1 if theres a winner, 0 if theres a draw, and -1 if the games not over
+        if terminal_status == 1: # There's a winner
             return 1000
-        elif terminal_status == 1: # There's a draw
+        elif terminal_status == 0: # There's a draw
             return 0
         elif terminal_status == -1: # Games not over
             return -1000
@@ -114,18 +109,11 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     
     # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
     def terminal_test(self, board_state):
-        
-        # This functions assumes that the given state is valid
-        def theres_a_draw():
-            for i in range(NUMCOLS):
-                if board_state[i][0] == EMPTY:
-                        return False
-            return True
 
-        if self.check_for_win(): # Calculate who we are and pass it in
-            return 0
-        elif theres_a_draw():
+        if self.check_for_win(board_state): 
             return 1
+        elif self.check_for_draw(board_state):
+            return 0
         else:
             return -1
 
@@ -146,7 +134,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return (v, move)
         return (v,move)
     
-    def min_value(self,board_state, alpha, beta):
+    def min_value(self, board_state, alpha, beta):
         if self.utility(board_state) != -1000:
             return self.utility(board_state), None
         v = math.inf
@@ -162,7 +150,14 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     
     # Helper functions
 
-    def check_for_win(player, board_state): # options are PLAYER1, PLAYER2, or ANY
+    def check_for_draw(self, board_state): # This functions assumes that the given state is valid
+        for i in range(NUMCOLS):
+            if board_state[i][0] == EMPTY:
+                    return False
+        return True
+    
+
+    def check_for_win(self, board_state, player="any"): # options are PLAYER1, PLAYER2, or if no player is provided we check if there is any winner
 
         def horizontal_win():
             win = False
@@ -180,12 +175,14 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             win = False
             for col in range(NUMCOLS):
                 for row in range(3):
+                    print("col: "+str(col)+" - row: "+str(row)+" current piece: "+str(board_state[col][row]))
                     if board_state[col][row] != EMPTY:
                         win = (board_state[col][row] == board_state[col][row + 1]) and (
                             board_state[col][row] == board_state[col][row + 2]) and (
                                 board_state[col][row] == board_state[col][row + 3])
                     if win:
                         return True
+                print()
             return False
 
         def neg_diagonal_win():
@@ -212,20 +209,22 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                         return True
             return False
         
-        return (horizontal_win() or
-                    vertical_win() or
-                    neg_diagonal_win() or
-                    pos_diagonal_win()) 
+        return (horizontal_win() 
+                or vertical_win() 
+                or neg_diagonal_win() 
+                or pos_diagonal_win()) 
 
 
-    def get_current_player(board_state):
+    def get_current_player(self, board_state):
         
         player1_piece_count = sum(row.count(1) for row in board_state)
         player2_piece_count = sum(row.count(2) for row in board_state)
 
         if player2_piece_count < player1_piece_count:
+            print("It's players2's turn")
             return PLAYER2
         elif player2_piece_count == player1_piece_count:
+            print("It's players1's turn")
             return PLAYER1
         else:
             raise ValueError(
