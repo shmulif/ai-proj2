@@ -58,8 +58,9 @@ class ConnectFourRandomPlayer(ConnectFourPlayer):
 
 class ConnectFourAIPlayer(ConnectFourPlayer):
 
-    def __init__(self, model):
+    def __init__(self, model, max_search_depth=42):
         self.model = model
+        self.max_search_depth = max_search_depth
         self.initialize_game_specifications()
 
     def initialize_game_specifications(self):
