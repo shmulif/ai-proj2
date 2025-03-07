@@ -72,6 +72,24 @@ board_states = [
         [-1, -1, -1, 1, 1, 2],  # Col 5
         [-1, -1, -1, -1, 1, 2],  # Col 6
         [-1, -1, -1, -1, -1, 1]   # Col 7
+    ],
+    [ # Board state 8: A board with all 1s
+        [1, 1, 1, 1, 1, 1],  # Col 1
+        [1, 1, 1, 1, 1, 1],  # Col 2
+        [1, 1, 1, 1, 1, 1],  # Col 3
+        [1, 1, 1, 1, 1, 1],  # Col 4
+        [1, 1, 1, 1, 1, 1],  # Col 5
+        [1, 1, 1, 1, 1, 1],  # Col 6
+        [1, 1, 1, 1, 1, 1]   # Col 7
+    ],
+    [ # Board state 9: A board with all 2s
+        [2, 2, 2, 2, 2, 2],  # Col 1
+        [2, 2, 2, 2, 2, 2],  # Col 2
+        [2, 2, 2, 2, 2, 2],  # Col 3
+        [2, 2, 2, 2, 2, 2],  # Col 4
+        [2, 2, 2, 2, 2, 2],  # Col 5
+        [2, 2, 2, 2, 2, 2],  # Col 6
+        [2, 2, 2, 2, 2, 2]   # Col 7
     ]
 ]
 
@@ -82,7 +100,9 @@ board_state_label = [
                      'A (horizontal) win for player 1', 
                      'A (vertical) win for player 2', 
                      'A (pos diagonal) win for player 1',
-                     'A (neg diagonal) win for player 1'
+                     'A (neg diagonal) win for player 1',
+                     'A board with all 1s',
+                     'A board with all 2s'
                      ]
 
 
@@ -120,11 +140,16 @@ def debut_ai(model, board_states):
         
         # Test specific functions
 
-        test_valid_actions(ai_player, state) # Verified
-        test_result(ai_player, 3, state) # Verified
-        test_utility(ai_player, state) # Verified
-        test_terminal_test(ai_player, state) # Verified
+        # test_valid_actions(ai_player, state) # Verified
+        # test_result(ai_player, 2, state) # Verified
+        # test_utility(ai_player, state) # Verified
+        # test_terminal_test(ai_player, state) # Verified
+
+        test_mid_game_utility(ai_player, state, 1, 2)
+        # test_check_win_potential(ai_player, 'SW', state, 1, 3, 2)
+
         # test_alpha_beta_search(ai_player, state)
+
 
 # Functions to test individual functions in ConnectFourAIPlayer
 def test_valid_actions(ai_player, board_state):
@@ -151,6 +176,16 @@ def test_alpha_beta_search(ai_player, board_state):
     print("\nTesting alpha_beta_search function:")
     best_move = ai_player.alpha_beta_search(board_state)
     print(best_move)
+
+def test_mid_game_utility(ai_player, board_state,  our_piece, enemy_piece):
+    print("\nTesting mid_game_utility function:")
+    mid_game_utility = ai_player.mid_game_utility(board_state,  our_piece, enemy_piece)
+    print(mid_game_utility)
+
+def test_check_win_potential(ai_player, direction, board_state,  our_piece, i, j):
+    print("\nTesting check_win_potential function:")
+    win_potential = ai_player.check_win_potential(direction, board_state,  our_piece, i, j)
+    print(win_potential)
 
 # Function to print the board state
 def print_board(board_state):

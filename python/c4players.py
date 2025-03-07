@@ -69,7 +69,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         self.EMPTY = c4model.EMPTY # -1
 
         self.NUMROWS = c4model.NUMROWS # 6
-        self.NUMCOLS = c4model.NUMROWS # 7
+        self.NUMCOLS = c4model.NUMCOLS # 7
 
     def get_move(self):
         m = self.alpha_beta_search(self.model.get_grid())
@@ -99,28 +99,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return board_state_copy  # Return the updated board state
 
         raise ValueError(f"Column {action} is full!")  # No empty slots
-    
-    def utility(self, board_state):
-        terminal_status = self.terminal_test(board_state) # Returns 1 if theres a winner, 0 if theres a draw, and -1 if the games not over
-        if terminal_status == 1: # There's a winner
-            return 1000
-        elif terminal_status == 0: # There's a draw
-            return 0
-        elif terminal_status == -1: # Games not over
-            return -1000
-        else:
-            print("We shouldnt have gotten here! There's some error in the code, go fix it please")
             
-    
-    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
-    def terminal_test(self, board_state):
-
-        if self.check_for_win(board_state): 
-            return 1
-        elif self.check_for_draw(board_state):
-            return 0
-        else:
-            return -1
 
     def alpha_beta_search(self,board_state):
         output = self.max_value(board_state, -1000, 1000)
@@ -152,10 +131,162 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return (v, move)
         return (v,move)
     
-    
-    # Helper functions
+        
+    def utility(self, board_state):
+        
+        if self.check_for_win(board_state):
+            return 1000 # There's a win!
+        elif self.check_for_full_board(board_state):
+            return 0 # Theres a draw (A full board without a win is a draw)
+        else: 
+            return -1000 # The game isn't over
 
-    def check_for_draw(self, board_state): # This functions assumes that the given state is valid
+    
+    """
+    In this method we check for a potential 
+    win in each of these eight directions:
+
+              N
+              ↑
+       NW  ↖  |  ↗  NE
+            \ | /
+    W  ← - - - - - - →  E
+            / | \
+       SW  ↙  |  ↘  SE
+              ↓
+              S
+            
+    """
+
+    def mid_game_utility(self, board_state, our_piece, enemy_piece):
+
+        # First check if the games over:
+
+        # max_utility = ?
+        # min_utility = ?       
+        # if self.check_for_win(board_state, our_piece):
+        #     return max_utility
+        # elif self.check_for_win(board_state, enemy_piece):
+        #     return min_utility
+        # elif self.check_for_full_board(): 
+        #     return 0 # Theres a draw (A full board without a win is a draw)
+        
+        # If the games not over, proceed to claculate the utility:
+
+        score = 0
+        
+        # We measure utility for each piece in the grid, and add it to the total utility
+        for i in range(len(board_state)):
+            for j in range(len(board_state[i])):
+                
+                current_piece = board_state[i][j]
+            
+                if current_piece == our_piece or current_piece == self.EMPTY:
+                    score += self.check_win_potential('N', board_state, our_piece, i, j)
+                    score += self.check_win_potential('NE', board_state, our_piece, i, j)
+                    score += self.check_win_potential('E', board_state, our_piece, i, j)
+                    score += self.check_win_potential('SE', board_state, our_piece, i, j)
+                    score += self.check_win_potential('S', board_state, our_piece, i, j)
+                    score += self.check_win_potential('SW', board_state, our_piece, i, j)
+                    score += self.check_win_potential('W', board_state, our_piece, i, j)
+                    score += self.check_win_potential('NW', board_state, our_piece, i, j)
+                
+                else: # If the peice is the enemy's piece, subtract the
+                    score -= self.check_win_potential('N', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('NE', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('E', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('SE', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('S', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('SW', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('W', board_state, enemy_piece, i, j)
+                    score -= self.check_win_potential('NW', board_state, enemy_piece, i, j)
+            
+            
+        return score
+            
+    """
+    Returns a number from -1 to 3
+    -1 means we can't get a win in this direction (we loose a point)
+    0 means we could get a win
+    1 means we could get a win and we already have 1 of the pieces
+    2 means we could get a win and we already have 2 of the pieces
+    3 means we could get a win and we already have 3 of the pieces
+    """
+    def check_win_potential(self, direction, board_state, our_piece,  i, j):
+                
+        sub_score = 0
+
+        print("Direction is "+str(direction))
+        
+        if direction == 'N':
+            step_col = 0 # Stay in the same column
+            step_row = -1 # Go towards the top (beggining) of the column
+        elif direction == 'NE':
+            step_col = 1 # Go to the next column
+            step_row = -1 # Go towards the top (beggining) of the column
+        elif direction == 'E':
+            step_col = 1 # Go to the next column
+            step_row = 0 # Stay at the same level in the column
+        elif direction == 'SE':
+            step_col = 1 # Go to the next column
+            step_row = 1 # Go towards the bottom (end) of the column
+        elif direction == 'S':
+            step_col = 0 # Stay in the same column
+            step_row = 1 # Go towards the bottom (end) of the column
+        elif direction == 'SW':
+            step_col = -1 # Go to the previous column
+            step_row = 1 # Go towards the bottom (end) of the column
+        elif direction == 'W':
+            step_col = -1 # Go to the previous column
+            step_row = 0 # Stay at the same level in the column
+        elif direction == 'NW':
+            step_col = -1 # Go to the previous column
+            step_row = -1 # Go towards the top (beggining) of the column
+            
+        for k in range(4):
+        
+            col_index = i + (k * step_col)
+            row_index = j + (k * step_row)
+
+            # print(f"k * step_col = {k} * {step_col} = {k*step_col}")
+            print(f"iteration {k}")
+            print(f"col_index {col_index} --- row_index {row_index}")
+            if not self.in_board_range(col_index, row_index):
+                print("That's out of range")
+                return -1 # There aren't three more spots on the board in that direction
+            else:
+                piece = board_state[col_index][row_index]
+                print(f"the piece at this index is {piece}")
+                if piece == our_piece:
+                    print(f"that's ours! (remember we're {our_piece})")
+                    sub_score += 1
+                elif piece == self.EMPTY:
+                    print(f"That means it's an an empty spot")
+                    pass
+                else:
+                    print(f"That's our enemy's piece :( (because we're {our_piece})")
+                    return -1 # There's an enemy's piece blocking us
+            print()
+                
+        return sub_score
+
+
+
+    def in_board_range(self, col_index, row_index):
+        return (-1 < col_index and col_index < self.NUMCOLS 
+            and -1 < row_index and row_index < self.NUMROWS)
+    
+    # Returns 0 if theres a winner, 1 if theres a draw, and -1 if the games not over
+    def terminal_test(self, board_state):
+
+        if self.check_for_win(board_state): 
+            return 1
+        elif self.check_for_full_board(board_state):
+            return 0
+        else:
+            return -1
+
+    def check_for_full_board(self, board_state): # This functions assumes that the given state is valid
         for i in range(self.NUMCOLS):
             if board_state[i][0] == self.EMPTY:
                     return False
@@ -224,10 +355,10 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         player2_piece_count = sum(row.count(2) for row in board_state)
 
         if player2_piece_count < player1_piece_count:
-            print("It's players2's turn")
+            # print("It's players2's turn")
             return self.PLAYER2
         elif player2_piece_count == player1_piece_count:
-            print("It's players1's turn")
+            # print("It's players1's turn")
             return self.PLAYER1
         else:
             raise ValueError(
@@ -244,5 +375,5 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         
         else:
             raise ValueError(
-                f"Invalid input: {player}! option's are player1, represented as: {self.PLAYER1}, or player2, represented as: {self.PLAYER2}"
+                f"Invalid input: {player}! option's are PLAYER1, represented as: {self.PLAYER1}, or PLAYER2, represented as: {self.PLAYER2}"
             )
