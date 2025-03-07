@@ -157,19 +157,23 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
               S
             
     """
-
+    
+    # This function isn't isnt fully ready, 
+    # The check_for_win function  needs to be ammended to check for a win from a specific player
+    # It currently checks for any win.
     def mid_game_utility(self, board_state, our_piece, enemy_piece):
 
         # First check if the games over:
 
-        # max_utility = ?
-        # min_utility = ?       
-        # if self.check_for_win(board_state, our_piece):
-        #     return max_utility
-        # elif self.check_for_win(board_state, enemy_piece):
-        #     return min_utility
-        # elif self.check_for_full_board(): 
-        #     return 0 # Theres a draw (A full board without a win is a draw)
+        max_utility = 492 # This is the score when the board is completely filled with our pieces
+        min_utility = -492 # This is the score when the board is completely filled with the opponent’s pieces     
+
+        if self.check_for_win(board_state, our_piece):
+            return max_utility
+        elif self.check_for_win(board_state, enemy_piece): 
+            return min_utility
+        elif self.check_for_full_board(board_state): 
+            return 0 # Theres a draw (A full board without a win is a draw)
         
         # If the games not over, proceed to claculate the utility:
 
@@ -214,9 +218,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     """
     def check_win_potential(self, direction, board_state, our_piece,  i, j):
                 
-        sub_score = 0
-
-        print("Direction is "+str(direction))
+        sub_score = 1 # If the four spots are open, this amount will not get updated
         
         if direction == 'N':
             step_col = 0 # Stay in the same column
@@ -248,26 +250,17 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             col_index = i + (k * step_col)
             row_index = j + (k * step_row)
 
-            # print(f"k * step_col = {k} * {step_col} = {k*step_col}")
-            print(f"iteration {k}")
-            print(f"col_index {col_index} --- row_index {row_index}")
             if not self.in_board_range(col_index, row_index):
-                print("That's out of range")
                 return -1 # There aren't three more spots on the board in that direction
             else:
                 piece = board_state[col_index][row_index]
-                print(f"the piece at this index is {piece}")
                 if piece == our_piece:
-                    print(f"that's ours! (remember we're {our_piece})")
                     sub_score += 1
                 elif piece == self.EMPTY:
-                    print(f"That means it's an an empty spot")
-                    pass
+                    continue
                 else:
-                    print(f"That's our enemy's piece :( (because we're {our_piece})")
                     return -1 # There's an enemy's piece blocking us
-            print()
-                
+                                
         return sub_score
 
 

@@ -144,9 +144,8 @@ def debut_ai(model, board_states):
         # test_result(ai_player, 2, state) # Verified
         # test_utility(ai_player, state) # Verified
         # test_terminal_test(ai_player, state) # Verified
-
-        test_mid_game_utility(ai_player, state, 1, 2)
-        # test_check_win_potential(ai_player, 'SW', state, 1, 3, 2)
+        # test_mid_game_utility(ai_player, state, 1, 2) # Verified
+        # test_check_win_potential(ai_player, 'SW', state, 1, 3, 2) # Verified
 
         # test_alpha_beta_search(ai_player, state)
 
