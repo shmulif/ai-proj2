@@ -1,13 +1,6 @@
 import math
 import c4players
 
-PLAYER1 = 1
-PLAYER2 = 2
-EMPTY = -1
-
-NUMROWS = 6
-NUMCOLS = 7
-
 # Sample board states
 board_states = [
     [  # Board state 1: A board with no winner yet
@@ -93,7 +86,7 @@ board_states = [
     ]
 ]
 
-board_state_label = [
+board_state_labels = [
                      'A board with no winner yet', 
                      'An empty board', 
                      'A draw', 
@@ -104,18 +97,6 @@ board_state_label = [
                      'A board with all 1s',
                      'A board with all 2s'
                      ]
-
-
-def create_empty_grid():
-    new_grid = []
-    for i in range(NUMCOLS):
-        column = []
-        for j in range(NUMROWS):
-            if j != 1:
-                column.append(EMPTY)
-            else:
-                column.append(6)
-        board_states.append(column)
 
 
 # Simulate running the AI with each board state
@@ -135,7 +116,7 @@ def debut_ai(model, board_states):
     
     for idx, state in enumerate(board_states):
         iteration += 1
-        print(f"\nTesting board state {iteration}: " + board_state_label[iteration-1])
+        print(f"\nTesting board state {iteration}: " + board_state_labels[iteration-1])
         print_board(state)
         
         # Test specific functions
