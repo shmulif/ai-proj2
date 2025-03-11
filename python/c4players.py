@@ -88,7 +88,6 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
     
     def result(self, action, board_state): 
-        print(board_state)
         # Perform a **deep copy** of the board
         board_state_copy = [col[:] for col in board_state]  # Copy each column separately
         
@@ -104,7 +103,6 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             
 
     def alpha_beta_search(self,board_state):
-        print(board_state)
         output = self.max_value(board_state, -1000, 1000)
         return output[1]
     
