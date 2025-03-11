@@ -158,7 +158,7 @@ class TTT3PlayerAIPlayer:
         # only checks if next move will be the win
         if self.terminal_test(state) and depth == 1: 
             return None, self.utility(state)[self.player_number] 
-
+    
         if depth == 5:  
             return None, self.eval(state)[self.player_number]
 

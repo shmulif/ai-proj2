@@ -11,7 +11,7 @@ def play_single_game():
     # Feel free to rotate which type of player is which
     player1 = TTT3PlayerHumanPlayer(model, 'X')
     player2 = TTT3PlayerAIPlayer(model, 'O')
-    player3 = TTT3PlayerHumanPlayer(model, '+')
+    player3 = TTT3PlayerAIPlayer(model, '+')
 
     # Player 1 must be X player, Player 2 must be O player
     # and Player 3 must be + player
