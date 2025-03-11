@@ -73,7 +73,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         self.NUMCOLS = c4model.NUMCOLS # 7
 
     def get_move(self):
-        m = self.alpha_beta_search(self.model.get_grid())
+        m = self.alpha_beta_search(self.model.get_grid(),self.max_search_depth)
         return m
         """ OLD CODE, LEFT FIRST
         moves = self.model.get_valid_moves()
@@ -102,16 +102,16 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         raise ValueError(f"Column {action} is full!")  # No empty slots
             
 
-    def alpha_beta_search(self,board_state):
-        output = self.max_value(board_state, -1000, 1000)
+    def alpha_beta_search(self,board_state, depth):
+        output = self.max_value(board_state, -1000, 1000, depth)
         return output[1]
     
-    def max_value(self,board_state, alpha, beta):
-        if self.utility(board_state) != -1000:
+    def max_value(self,board_state, alpha, beta, depth):
+        if self.utility(board_state) != -1000 or depth <= 0:
             return (self.utility(board_state), None)
         v = -math.inf
         for a in self.valid_actions(board_state):
-            (v2,a2) = self.min_value(self.result(a,board_state),alpha,beta)
+            (v2,a2) = self.min_value(self.result(a,board_state),alpha,beta, depth - 1)
             if v2 > v:
                 (v,move) = v2,a
                 alpha = max(alpha, v)
@@ -119,12 +119,12 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return (v, move)
         return (v,move)
     
-    def min_value(self, board_state, alpha, beta):
-        if self.utility(board_state) != -1000:
+    def min_value(self, board_state, alpha, beta, depth):
+        if self.utility(board_state) != -1000 or depth <= 0:
             return self.utility(board_state), None
         v = math.inf
         for a in self.valid_actions(board_state):
-            (v2,a2) = self.max_value(self.result(a,board_state),alpha,beta)
+            (v2,a2) = self.max_value(self.result(a,board_state),alpha,beta, depth-1)
             if v2 < v:
                 (v,move) = v2,a
                 beta = min(beta, v)
