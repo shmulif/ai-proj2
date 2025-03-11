@@ -88,6 +88,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
     
     def result(self, action, board_state): 
+        print(board_state)
         # Perform a **deep copy** of the board
         board_state_copy = [col[:] for col in board_state]  # Copy each column separately
         
@@ -103,6 +104,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             
 
     def alpha_beta_search(self,board_state):
+        print(board_state)
         output = self.max_value(board_state, -1000, 1000)
         return output[1]
     
@@ -111,7 +113,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             return (self.utility(board_state), None)
         v = -math.inf
         for a in self.valid_actions(board_state):
-            (v2,a2) = self.min_value(self.result(board_state,a),alpha,beta)
+            (v2,a2) = self.min_value(self.result(a,board_state),alpha,beta)
             if v2 > v:
                 (v,move) = v2,a
                 alpha = max(alpha, v)
@@ -124,7 +126,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             return self.utility(board_state), None
         v = math.inf
         for a in self.valid_actions(board_state):
-            (v2,a2) = self.max_value(self.result(board_state,a),alpha,beta)
+            (v2,a2) = self.max_value(self.result(a,board_state),alpha,beta)
             if v2 < v:
                 (v,move) = v2,a
                 beta = min(beta, v)
@@ -291,51 +293,97 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         def horizontal_win():
             win = False
-            for row in range(self.NUMROWS):
-                for col in range(4):
-                    if board_state[col][row] != self.EMPTY:
-                        win = (board_state[col][row] == board_state[col + 1][row]) and (
-                            board_state[col][row] == board_state[col + 2][row]) and (
-                                board_state[col][row] == board_state[col + 3][row])
-                    if win:
-                        return True
-            return False
+            if player == "any":
+                for row in range(self.NUMROWS):
+                    for col in range(4):
+                        if board_state[col][row] != self.EMPTY:
+                            win = (board_state[col][row] == board_state[col + 1][row]) and (
+                                board_state[col][row] == board_state[col + 2][row]) and (
+                                    board_state[col][row] == board_state[col + 3][row])
+                        if win:
+                            return True
+                return False
+            else:
+                for row in range(self.NUMROWS):
+                    for col in range(4):
+                        if board_state[col][row] == player:
+                            win = (board_state[col][row] == board_state[col + 1][row]) and (
+                                board_state[col][row] == board_state[col + 2][row]) and (
+                                    board_state[col][row] == board_state[col + 3][row])
+                        if win:
+                            return True
+                return False
+
 
         def vertical_win():
             win = False
-            for col in range(self.NUMCOLS):
-                for row in range(3):
-                    if board_state[col][row] != self.EMPTY:
-                        win = (board_state[col][row] == board_state[col][row + 1]) and (
-                            board_state[col][row] == board_state[col][row + 2]) and (
-                                board_state[col][row] == board_state[col][row + 3])
-                    if win:
-                        return True
-            return False
+            if player == "any":
+                for col in range(self.NUMCOLS):
+                    for row in range(3):
+                        if board_state[col][row] != self.EMPTY:
+                            win = (board_state[col][row] == board_state[col][row + 1]) and (
+                                board_state[col][row] == board_state[col][row + 2]) and (
+                                    board_state[col][row] == board_state[col][row + 3])
+                        if win:
+                            return True
+                return False
+            else:
+                for col in range(self.NUMCOLS):
+                    for row in range(3):
+                        if board_state[col][row] == player:
+                            win = (board_state[col][row] == board_state[col][row + 1]) and (
+                                board_state[col][row] == board_state[col][row + 2]) and (
+                                    board_state[col][row] == board_state[col][row + 3])
+                        if win:
+                            return True
+                return False
+
 
         def neg_diagonal_win():
             win = False
-            for col in range(4):
-                for row in range(3):
-                    if board_state[col][row] != self.EMPTY:
-                        win = (board_state[col][row] == board_state[col + 1][row + 1]) and (
-                            board_state[col][row] == board_state[col + 2][row + 2]) and (
-                                board_state[col][row] == board_state[col + 3][row + 3])
-                    if win:
-                        return True
-            return False
+            if player == "any":
+                for col in range(4):
+                    for row in range(3):
+                        if board_state[col][row] != self.EMPTY:
+                            win = (board_state[col][row] == board_state[col + 1][row + 1]) and (
+                                board_state[col][row] == board_state[col + 2][row + 2]) and (
+                                    board_state[col][row] == board_state[col + 3][row + 3])
+                        if win:
+                            return True
+                return False
+            else:
+                for col in range(4):
+                    for row in range(3):
+                        if board_state[col][row] == player:
+                            win = (board_state[col][row] == board_state[col + 1][row + 1]) and (
+                                board_state[col][row] == board_state[col + 2][row + 2]) and (
+                                    board_state[col][row] == board_state[col + 3][row + 3])
+                        if win:
+                            return True
+                return False
 
         def pos_diagonal_win():
             win = False
-            for col in range(3, 7):
-                for row in range(3):
-                    if board_state[col][row] != self.EMPTY:
-                        win = (board_state[col][row] == board_state[col - 1][row + 1]) and (
-                            board_state[col][row] == board_state[col - 2][row + 2]) and (
-                                board_state[col][row] == board_state[col - 3][row + 3])
-                    if win:
-                        return True
-            return False
+            if player == "any":
+                for col in range(3, 7):
+                    for row in range(3):
+                        if board_state[col][row] != self.EMPTY:
+                            win = (board_state[col][row] == board_state[col - 1][row + 1]) and (
+                                board_state[col][row] == board_state[col - 2][row + 2]) and (
+                                    board_state[col][row] == board_state[col - 3][row + 3])
+                        if win:
+                            return True
+                return False
+            else:
+                for col in range(3, 7):
+                    for row in range(3):
+                        if board_state[col][row] == player:
+                            win = (board_state[col][row] == board_state[col - 1][row + 1]) and (
+                                board_state[col][row] == board_state[col - 2][row + 2]) and (
+                                    board_state[col][row] == board_state[col - 3][row + 3])
+                        if win:
+                            return True
+                return False
 
         return (horizontal_win() 
                 or vertical_win() 

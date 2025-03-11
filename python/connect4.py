@@ -15,7 +15,7 @@ def play_single_game():
 
     # Change the constructor calls to change the players used
     player1 = c4players.ConnectFourHumanPlayer(model)
-    player2 = c4players.ConnectFourRandomPlayer(model)
+    player2 = c4players.ConnectFourAIPlayer(model)
 
     # Choose 1 of the Controller/View set-ups below
 
