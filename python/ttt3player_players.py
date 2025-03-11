@@ -150,7 +150,80 @@ class TTT3PlayerAIPlayer:
             return '+'
 
     def get_move(self):
-        """INSERT YOUR CODE HERE -- Should return an integer between 1-16"""
-        pass
+        state = self.model.get_grid()
+        best_action, _ = self.max_val(state) 
+        return best_action  
 
+    def max_val(self, state, depth=0):
+        # only checks if next move will be the win
+        if self.terminal_test(state) and depth == 1: 
+            return None, self.utility(state)[self.player_number] 
 
+        if depth == 5:  
+            return None, self.eval(state)[self.player_number]
+
+        best_value = float('-inf')
+        best_action = None 
+
+        for action in self.actions(state):
+            next_state = self.result(state, action)
+            _, value = self.max_val(next_state, depth + 1)  
+
+            if value > best_value: 
+                best_value = value
+                best_action = action
+        return best_action, best_value  
+
+    # checks for one symbol away from a win in all directions 
+    # if it exists but does not belong to the ai player it penalizes that action
+    # in an attempt to incentivize blocking the opponent 
+    def eval(self, state):
+        vector = [0, 0, 0] 
+
+        for row in range(4):
+            for startcol in range(2):
+                player_symbol = None
+
+                if ((state[row][startcol] is not None and state[row][startcol] == state[row][startcol+1] and state[row][startcol+2] is None) or
+                    (state[row][startcol] is not None and state[row][startcol] == state[row][startcol+2] and state[row][startcol+1] is None) or
+                    (state[row][startcol+1] is not None and state[row][startcol+1] == state[row][startcol+2] and state[row][startcol] is None)):
+                    player_symbol = state[row][startcol] if state[row][startcol] is not None else state[row][startcol+1]
+
+                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+
+        for col in range(4):
+            for startrow in range(2):
+                player_symbol = None
+
+                if ((state[startrow][col] is not None and state[startrow][col] == state[startrow+1][col] and state[startrow+2][col] is None) or
+                    (state[startrow][col] is not None and state[startrow][col] == state[startrow+2][col] and state[startrow+1][col] is None) or
+                    (state[startrow+1][col] is not None and state[startrow+1][col] == state[startrow+2][col] and state[startrow][col] is None)):
+                    player_symbol = state[startrow][col] if state[startrow][col] is not None else state[startrow+1][col]
+
+                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2 
+
+        for startrow in range(2):
+            for startcol in range(2):
+                player_symbol = None
+
+                if ((state[startrow][startcol] is not None and state[startrow][startcol] == state[startrow+1][startcol+1] and state[startrow+2][startcol+2] is None) or
+                    (state[startrow][startcol] is not None and state[startrow][startcol] == state[startrow+2][startcol+2] and state[startrow+1][startcol+1] is None) or
+                    (state[startrow+1][startcol+1] is not None and state[startrow+1][startcol+1] == state[startrow+2][startcol+2] and state[startrow][startcol] is None)):
+                    player_symbol = state[startrow][startcol] if state[startrow][startcol] is not None else state[startrow+1][startcol+1]
+
+                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+
+        for startrow in range(2, 4): 
+            for startcol in range(2):
+                player_symbol = None
+
+                if ((state[startrow][startcol] is not None and state[startrow][startcol] == state[startrow-1][startcol+1] and state[startrow-2][startcol+2] is None) or
+                    (state[startrow][startcol] is not None and state[startrow][startcol] == state[startrow-2][startcol+2] and state[startrow-1][startcol+1] is None) or
+                    (state[startrow-1][startcol+1] is not None and state[startrow-1][startcol+1] == state[startrow-2][startcol+2] and state[startrow][startcol] is None)):
+                    player_symbol = state[startrow][startcol] if state[startrow][startcol] is not None else state[startrow-1][startcol+1]
+
+                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+                    
+        vector[self.player_number] = -1000 if vector[self.player_number] < 0 else vector[self.player_number]
+        vector[self.player_number] += 1 if vector[self.player_number] == 0 else vector[self.player_number]
+        return vector 

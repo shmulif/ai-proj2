@@ -1,10 +1,8 @@
 from ttt3player_mvc import *
 from ttt3player_players import *
 
-
 def main():
     play_single_game()
-
 
 def play_single_game():
     model = TTT3PlayerModel()
@@ -20,7 +18,6 @@ def play_single_game():
     controller = TTT3PlayerController(model, player1, player2, player3)
 
     winner = controller.start()
-
 
 if __name__ == '__main__':
     main()
