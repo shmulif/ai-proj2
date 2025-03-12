@@ -151,32 +151,36 @@ class TTT3PlayerAIPlayer:
 
     def get_move(self):
         state = self.model.get_grid()
-        best_action, _ = self.max_val(state) 
+        best_action, _ = self.max_val(state, self.symbol) 
         return best_action  
 
-    def max_val(self, state, depth=0):
-        # only checks if next move will be the win
-        if self.terminal_test(state) and depth == 1: 
-            return None, self.utility(state)[self.player_number] 
+    def max_val(self, state, current_player, depth=0):
+     
+        if self.terminal_test(state): 
+            return None, self.utility(state)
     
         if depth == 5:  
-            return None, self.eval(state)[self.player_number]
+            return None, self.eval(state)
 
-        best_value = float('-inf')
+        best_value = None
         best_action = None 
 
         for action in self.actions(state):
             next_state = self.result(state, action)
-            _, value = self.max_val(next_state, depth + 1)  
+            next_player = self.get_player(current_player)
+            _, value = self.max_val(next_state, next_player, depth + 1)  
 
-            if value > best_value: 
+            if best_value is None or value[self.symbol_player[current_player]] > best_value[self.symbol_player[current_player]]:
                 best_value = value
                 best_action = action
+
         return best_action, best_value  
+    
+    def get_player(self, current_player):
+        order = ['X', 'O', '+']
+        return order[(order.index(current_player) + 1) % 3]
 
     # checks for one symbol away from a win in all directions 
-    # if it exists but does not belong to the ai player it penalizes that action
-    # in an attempt to incentivize blocking the opponent 
     def eval(self, state):
         vector = [0, 0, 0] 
 
@@ -189,7 +193,7 @@ class TTT3PlayerAIPlayer:
                     (state[row][startcol+1] is not None and state[row][startcol+1] == state[row][startcol+2] and state[row][startcol] is None)):
                     player_symbol = state[row][startcol] if state[row][startcol] is not None else state[row][startcol+1]
 
-                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+                    vector[self.symbol_player[player_symbol]] += 1 
 
         for col in range(4):
             for startrow in range(2):
@@ -200,7 +204,7 @@ class TTT3PlayerAIPlayer:
                     (state[startrow+1][col] is not None and state[startrow+1][col] == state[startrow+2][col] and state[startrow][col] is None)):
                     player_symbol = state[startrow][col] if state[startrow][col] is not None else state[startrow+1][col]
 
-                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2 
+                    vector[self.symbol_player[player_symbol]] += 1 
 
         for startrow in range(2):
             for startcol in range(2):
@@ -211,7 +215,7 @@ class TTT3PlayerAIPlayer:
                     (state[startrow+1][startcol+1] is not None and state[startrow+1][startcol+1] == state[startrow+2][startcol+2] and state[startrow][startcol] is None)):
                     player_symbol = state[startrow][startcol] if state[startrow][startcol] is not None else state[startrow+1][startcol+1]
 
-                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+                    vector[self.symbol_player[player_symbol]] += 1 
 
         for startrow in range(2, 4): 
             for startcol in range(2):
@@ -222,8 +226,7 @@ class TTT3PlayerAIPlayer:
                     (state[startrow-1][startcol+1] is not None and state[startrow-1][startcol+1] == state[startrow-2][startcol+2] and state[startrow][startcol] is None)):
                     player_symbol = state[startrow][startcol] if state[startrow][startcol] is not None else state[startrow-1][startcol+1]
 
-                    vector[self.player_number] += 1 if self.symbol == player_symbol else vector[self.player_number] - 2   
+                    vector[self.symbol_player[player_symbol]] += 1   
                     
-        vector[self.player_number] = -1000 if vector[self.player_number] < 0 else vector[self.player_number]
-        vector[self.player_number] += 1 if vector[self.player_number] == 0 else vector[self.player_number]
+     
         return vector 
