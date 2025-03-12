@@ -62,6 +62,11 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         self.model = model
         self.max_search_depth = max_search_depth
         self.initialize_game_specifications()
+    
+    # This is used for the Extra Credit assignment. It is currently commented out as per the project document.
+    # Uncomment this for Extra Credit.
+    # def lut_board_state(board_state):
+    #     return hash(tuple(tuple(row) for row in board_state))
 
     def initialize_game_specifications(self):
         # Set up for connect four (this setup will be different in tic tac toe)
@@ -71,7 +76,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
 
         self.NUMROWS = c4model.NUMROWS # 6
         self.NUMCOLS = c4model.NUMCOLS # 7
-
+    
     def get_move(self):
         m = self.alpha_beta_search(self.model.get_grid(),self.max_search_depth)
         return m
@@ -105,6 +110,22 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     def alpha_beta_search(self,board_state, depth):
         output = self.max_value(board_state, -1000, 1000, depth)
         return output[1]
+
+    # The below is a variation of alpha_beta_search that is used explicitly for the Extra Credit.
+    # Comment the normal code out and uncomment this for Extra Credit. 
+    # It is the same as the above method, however, we use a look-up table in the form of a hash.
+    
+    # def alpha_beta_search(self,board_state, depth):
+    #     current_board_lut = self.lut_board_state(board_state)
+        
+    #     if current_board_lut in self.look_up_table:
+    #         return self.look_up_table[current_board_lut]
+    #     output = self.max_value(board_state, -1000, 1000, depth)
+    #     best_move = output[1]
+        
+    #     self.look_up_table[current_board_lut] = best_move
+        
+    #     return best_move
     
     def max_value(self,board_state, alpha, beta, depth):
         if self.utility(board_state) != -1000 or depth <= 0:
@@ -119,6 +140,30 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return (v, move)
         return (v,move)
     
+    # The below is a variation of max_value that is used explicitly for the Extra Credit.
+    # Comment the normal code out and uncomment this for Extra Credit. 
+    # It is the same as the above method, however, we use a look-up table in the form of a hash.
+    
+    # def max_value(self,board_state, alpha, beta, depth):
+    #     current_board_lut = self.lut_board_state(board_state)
+        
+    #     if current_board_lut in self.look_up_table:
+    #         return self.look_up_table[current_board_lut], None
+    #     if self.utility(board_state) != -1000 or depth <= 0:
+    #         return (self.utility(board_state), None)
+    #     v = -math.inf
+    #     move = None
+    #     for a in self.valid_actions(board_state):
+    #         new_board = self.result(a, board_state)
+    #         (v2,a2) = self.min_value(self.result(a,board_state),alpha,beta, depth - 1)
+    #         if v2 > v:
+    #             (v,move) = v2,a
+    #             alpha = max(alpha, v)
+    #         if v >= beta:
+    #             break
+    #     self.look_up_table[current_board_lut] = (v, move)
+    #     return (v,move)
+    
     def min_value(self, board_state, alpha, beta, depth):
         if self.utility(board_state) != -1000 or depth <= 0:
             return self.utility(board_state), None
@@ -132,7 +177,29 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
                 return (v, move)
         return (v,move)
     
+    # The below is a variation of min_value that is used explicitly for the Extra Credit.
+    # Comment the normal code out and uncomment this for Extra Credit. 
+    # It is the same as the above method, however, we use a look-up table in the form of a hash.
+    
+    # def min_value(self, board_state, alpha, beta, depth):
+    #     current_board_lut = self.lut_board_state(board_state)
         
+    #     if current_board_lut in self.look_up_table:
+    #         return self.look_up_table[current_board_lut], None
+    #     if self.utility(board_state) != -1000 or depth <= 0:
+    #         return self.utility(board_state), None
+    #     v = math.inf
+    #     move = None
+    #     for a in self.valid_actions(board_state):
+    #         (v2,a2) = self.max_value(self.result(a,board_state),alpha,beta, depth-1)
+    #         if v2 < v:
+    #             (v,move) = v2,a
+    #             beta = min(beta, v)
+    #         if v <= alpha:
+    #             break
+    #     self.look_up_table[current_board_lut] = (v, move)
+    #     return (v,move)
+    
     def utility(self, board_state):
         
         if self.check_for_win(board_state):
