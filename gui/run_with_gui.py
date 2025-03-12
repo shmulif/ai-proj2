@@ -1,6 +1,8 @@
 import subprocess
 import os
 
+""""" This does not work with a human player """""
+
 # Set the program to input
 Program1 = 'python/connect4.py'
 
