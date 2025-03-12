@@ -111,6 +111,7 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
         output = self.max_value(board_state, -1000, 1000, depth)
         return output[1]
 
+
     # The below is a variation of alpha_beta_search that is used explicitly for the Extra Credit.
     # Comment the normal code out and uncomment this for Extra Credit. 
     # It is the same as the above method, however, we use a look-up table in the form of a hash.
@@ -128,8 +129,8 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     #     return best_move
     
     def max_value(self,board_state, alpha, beta, depth):
-        if self.utility(board_state) != -1000 or depth <= 0:
-            return (self.utility(board_state), None)
+        if self.mid_game_utility(board_state, self.PLAYER2, self.PLAYER1) == -492 or depth <= 0:
+            return (self.mid_game_utility(board_state, self.PLAYER2, self.PLAYER1), None)
         v = -math.inf
         for a in self.valid_actions(board_state):
             (v2,a2) = self.min_value(self.result(a,board_state),alpha,beta, depth - 1)
@@ -165,8 +166,8 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
     #     return (v,move)
     
     def min_value(self, board_state, alpha, beta, depth):
-        if self.utility(board_state) != -1000 or depth <= 0:
-            return self.utility(board_state), None
+        if self.mid_game_utility(board_state, self.PLAYER2, self.PLAYER1) == -492 or depth <= 0:
+            return self.mid_game_utility(board_state, self.PLAYER2, self.PLAYER1), None
         v = math.inf
         for a in self.valid_actions(board_state):
             (v2,a2) = self.max_value(self.result(a,board_state),alpha,beta, depth-1)
@@ -244,7 +245,6 @@ class ConnectFourAIPlayer(ConnectFourPlayer):
             return 0 # Theres a draw (A full board without a win is a draw)
         
         # If the games not over, proceed to claculate the utility:
-
         score = 0
         
         # We measure utility for each piece in the grid, and add it to the total utility
