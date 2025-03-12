@@ -170,6 +170,7 @@ class TTT3PlayerAIPlayer:
             next_player = self.get_player(current_player)
             _, value = self.max_val(next_state, next_player, depth + 1)  
 
+            #each player maximizes their own value
             if best_value is None or value[self.symbol_player[current_player]] > best_value[self.symbol_player[current_player]]:
                 best_value = value
                 best_action = action
